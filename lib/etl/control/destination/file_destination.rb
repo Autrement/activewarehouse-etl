@@ -21,7 +21,10 @@ module ETL #:nodoc:
       
       # The enclosure character
       attr_accessor :enclose
-      
+
+      # The representation of the nil value
+      attr_accessor :nil_as
+
       # Initialize the object.
       # * <tt>control</tt>: The Control object
       # * <tt>configuration</tt>: The configuration map
@@ -33,6 +36,7 @@ module ETL #:nodoc:
       # * <tt>:separator</tt>: Record separator (default is a comma)
       # * <tt>:eol</tt>: End of line marker (default is \n)
       # * <tt>:enclose</tt>: Enclosure character (default is none)
+      # * <tt>:nil_as</tt>: Representation of nil values (default is an empty string)
       # * <tt>:unique</tt>: Set to true to only write unique records
       # * <tt>:append_rows</tt>: Array of rows to append
       # 
@@ -46,6 +50,7 @@ module ETL #:nodoc:
         @separator = configuration[:separator] ||= ','
         @eol = configuration[:eol] ||= "\n"
         @enclose = configuration[:enclose]
+        @nil_as = configuration[:nil_as] ||= ''
         @unique = configuration[:unique] ? configuration[:unique] + scd_required_fields : configuration[:unique]
         @unique.uniq! unless @unique.nil?
         @order = mapping[:order] ? mapping[:order] + scd_required_fields : order_from_source
@@ -78,12 +83,14 @@ module ETL #:nodoc:
             case value
             when Date, Time, DateTime
               value.to_s(:db)
+            when nil
+              nil_as
             else
               value.to_s
             end
           end
-          
-          values.collect! { |v| v.gsub(/\\/, '\\\\\\\\')}
+
+          values.collect! { |v| v == nil_as ? v : v.gsub(/\\/, '\\\\\\\\')}
           values.collect! { |v| v.gsub(separator, "\\#{separator}")}
           values.collect! { |v| v.gsub(/\n|\r/, '')}
           
