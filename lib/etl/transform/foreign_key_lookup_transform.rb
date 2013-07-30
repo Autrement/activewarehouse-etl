@@ -7,7 +7,10 @@ module ETL #:nodoc:
       
       # The default foreign key to use if none is found.
       attr_accessor :default
-      
+
+      # Whether or not a default value has been set
+      attr_reader :has_default_value
+
       # Initialize the foreign key lookup transform.
       #
       # Configuration options:
@@ -23,8 +26,13 @@ module ETL #:nodoc:
         @collection = (configuration[:collection] || {})
         @resolver = configuration[:resolver]
         @resolver = @resolver.new if @resolver.is_a?(Class)
-        @default = configuration[:default]
-        
+
+        # A default value could be nil: we need a marker to indicates we have a default value
+        if configuration.has_key?(:default)
+          @default = configuration[:default]
+          @has_default_value = true
+        end
+
         configuration[:cache] = true if configuration[:cache].nil?
         
         if configuration[:cache]
@@ -44,7 +52,7 @@ module ETL #:nodoc:
           raise ResolverError, "Resolver does not appear to respond to resolve method" unless resolver.respond_to?(:resolve)
           fk = resolver.resolve(value)
           fk ||= @default
-          raise ResolverError, "Unable to resolve #{value} to foreign key for #{name} in row #{ETL::Engine.rows_read}. You may want to specify a :default value." unless fk
+          raise ResolverError, "Unable to resolve #{value} to foreign key for #{name} in row #{ETL::Engine.rows_read}. You may want to specify a :default value." if !fk && !has_default_value
           @collection[value] = fk
         end
         fk
