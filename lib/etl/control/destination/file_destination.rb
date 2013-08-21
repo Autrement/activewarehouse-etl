@@ -25,6 +25,9 @@ module ETL #:nodoc:
       # The representation of the nil value
       attr_accessor :nil_as
 
+      # The representation of a new line char (mysql by default needs a '\n')
+      attr_accessor :new_line_as
+
       # Initialize the object.
       # * <tt>control</tt>: The Control object
       # * <tt>configuration</tt>: The configuration map
@@ -51,6 +54,7 @@ module ETL #:nodoc:
         @eol = configuration[:eol] ||= "\n"
         @enclose = configuration[:enclose]
         @nil_as = configuration[:nil_as] ||= ''
+        @new_line_as = configuration[:new_line_as] ||= ''
         @unique = configuration[:unique] ? configuration[:unique] + scd_required_fields : configuration[:unique]
         @unique.uniq! unless @unique.nil?
         @order = mapping[:order] ? mapping[:order] + scd_required_fields : order_from_source
@@ -92,8 +96,8 @@ module ETL #:nodoc:
 
           values.collect! { |v| v == nil_as ? v : v.gsub(/\\/, '\\\\\\\\')}
           values.collect! { |v| v.gsub(separator, "\\#{separator}")}
-          values.collect! { |v| v.gsub(/\n|\r/, '')}
-          
+          values.collect! { |v| v.gsub(/\n|\r/, new_line_as)}
+
           # enclose the value if required
           if !enclose.nil?
             values.collect! { |v| enclose + v.gsub(/(#{enclose})/, '\\\\\1') + enclose }
