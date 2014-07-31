@@ -7,10 +7,13 @@ module ETL #:nodoc:
     class SaxParser < ETL::Parser::Parser
       
       # The write trigger causes whatever values are currently specified for the row to be returned.
-      # After returning the values will not be cleared, thus allowing for values which are assigned
-      # higher in the XML tree to remain in memory.
+      # After returning the values will not be cleared unless specified, thus allowing for values
+      # which are assigned higher in the XML tree to remain in memory.
       attr_accessor :write_trigger
-      
+
+      # Fields that will be clean up on each returned row. By default no field is cleaned.
+      attr_accessor :reset_fields
+
       # Initialize the parser
       # * <tt>source</tt>: The Source object
       # * <tt>options</tt>: Parser options Hash
@@ -42,6 +45,11 @@ module ETL #:nodoc:
         source.definition[:fields].each do |name, path|
           #puts "defined field #{name}, path: #{path}"
           fields << Field.new(name, XPath::Path.parse(path))
+        end
+        self.reset_fields = if source.definition[:reset_fields] == :all
+          fields
+        else
+          source.definition[:reset_fields] || []
         end
       end
       
@@ -116,10 +124,16 @@ module ETL #:nodoc:
           #puts "matched: #{@path} =~ #{@parser.write_trigger}"
           #puts "calling proc with #{@row.inspect}"
           @proc.call(@row.clone)
+          clean_row
         end
         
         @value = nil
         @path.elements.pop
+      end
+      def clean_row
+        @parser.reset_fields.each do |field|
+          @row.delete(field)
+        end
       end
       def progress(position)
         @position = position
