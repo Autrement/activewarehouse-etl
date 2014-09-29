@@ -47,7 +47,7 @@ module ETL #:nodoc:
           fields << Field.new(name, XPath::Path.parse(path))
         end
         self.reset_fields = if source.definition[:reset_fields] == :all
-          fields
+          source.definition[:fields].keys
         else
           source.definition[:reset_fields] || []
         end
