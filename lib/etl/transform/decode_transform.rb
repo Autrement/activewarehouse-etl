@@ -23,7 +23,7 @@ module ETL #:nodoc:
         
         @decode_table_path = (configuration[:decode_table_path] || 'decode.txt')
         @decode_table_delimiter = (configuration[:decode_table_delimiter] || ':')
-        @default_value = (configuration[:default_value] || 'No Value')
+        @default_value = (configuration.has_key?(:default_value) ? configuration[:default_value] : 'No Value')
       end
       
       # Transform the value

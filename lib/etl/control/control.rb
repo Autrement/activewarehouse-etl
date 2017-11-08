@@ -5,7 +5,8 @@ module ETL #:nodoc:
       require 'test/unit/assertions'
       include Test::Unit::Assertions
       attr_reader :control
-      
+      attr_accessor :assertions
+
       class << self
         # Create a Context instance
         def create(control)
@@ -16,6 +17,7 @@ module ETL #:nodoc:
       # Initialize the context
       def initialize(control)
         @control = control
+        @assertions = 0
       end
       
       # Get the control file
