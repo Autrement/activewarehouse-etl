@@ -1,4 +1,4 @@
-class CreateTables < ActiveRecord::Migration
+class CreateTables < ActiveRecord::Migration[5.0]
   def self.up
     create_table(:people, :force => true) do |t|
       t.column :first_name, :string

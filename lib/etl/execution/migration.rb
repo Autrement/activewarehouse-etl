@@ -17,7 +17,7 @@ module ETL #:nodoc:
           connection.initialize_schema_migrations_table
           last_migration.upto(target - 1) do |i| 
             __send__("migration_#{i+1}".to_sym)
-            connection.assume_migrated_upto_version(i+1)
+            connection.assume_migrated_upto_version(i+1, [])
           end
         end
         

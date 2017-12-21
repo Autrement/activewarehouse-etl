@@ -6,6 +6,14 @@ This tool is both usable and used in production under its current form - but be 
 
 "!https://secure.travis-ci.org/activewarehouse/activewarehouse-etl.png!":http://travis-ci.org/activewarehouse/activewarehouse-etl
 
+*Update 12/2017* : wow, if you read this, I hope you won't have to use this legacy code in Rails 5 like me. Consider "Kiba, a rewritten alternative":https://github.com/thbar/kiba and maintained.
+
+Anyway, this fork is intended to bring support for Rails 5.0 (possibly 5.1 in near future). You'll have to explicity add a dependency in your Gemfile:
+
+@gem 'activewarehouse-etl', github: "Autrement/activewarehouse-etl"@
+@gem 'adapter_extensions', github: "colinux/adapter_extensions" # add this@
+
+
 h2. Usage
 
 The documentation is sparse and not everything is up to date, too, but here are useful bits to get you started:
